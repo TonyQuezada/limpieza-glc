@@ -8,7 +8,7 @@ export default function Reglas({ regla, producciones }) {
                     {
                         producciones.map((produccion, index) => (
                             <div className="flex gap-1" key={index}>
-                                <div>{produccion}</div>
+                                <div>{produccion === "" ? "λ" : produccion}</div>
                                 {index !== producciones.length - 1 && <div>|</div>}
                             </div>
                         ))
