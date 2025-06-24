@@ -9,7 +9,7 @@ import Cuadrupla from './components/Cuadrupla'
 import Lista from './components/Lista'
 
 import { crearCuadrupla, classifyGrammar } from './assets/clasificar'
-import { eliminarProduccionesNulas, eliminarReglasDeDenominacion } from './assets/noGenerativas'
+import { eliminarReglasNoGenerativas, eliminarReglasDeRedenominacion } from './assets/noGenerativas'
 import { detectarSimbolosMuertos, limpiarSimbolosMuertos, detectarSimbolosInaccesibles, eliminarReglasInaccesibles } from './assets/limpieza'
 
 function App() {
@@ -36,7 +36,7 @@ function App() {
             const contenido = await leerTXT();
             gramaticaUsuario.current = contenido
             const objeto = formatoJSON(gramaticaUsuario.current)
-            // console.log(objeto)
+            console.log(objeto)
             setMostrarContenido(true)
             setGramaticaObjeto(objeto)
             setCuadrupla(crearCuadrupla(objeto))
@@ -44,10 +44,12 @@ function App() {
             const tipoGramatica = classifyGrammar(objeto)
             setTipo(tipoGramatica)
 
-            const objetoSinNoGenerativas = eliminarProduccionesNulas(objeto)
+            const objetoSinNoGenerativas = eliminarReglasNoGenerativas(objeto)
             setNoGenerativa(objetoSinNoGenerativas)
             
-            const sinRedenominacion = eliminarReglasDeDenominacion(objetoSinNoGenerativas)
+            console.log(objetoSinNoGenerativas)
+            
+            const sinRedenominacion = eliminarReglasDeRedenominacion(objetoSinNoGenerativas)
             setRedenominacion(sinRedenominacion)
 
             console.log(sinRedenominacion)

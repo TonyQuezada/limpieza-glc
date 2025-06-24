@@ -15,8 +15,9 @@ export default function formatoJSON ( gramatica ) {
         if(!(regla in gramaticaObjeto))
             gramaticaObjeto[regla] = []
 
-        for(let prod of producciones)
-            gramaticaObjeto[regla].push(prod)
+        for(let prod of producciones){
+                gramaticaObjeto[regla].push(prod)
+        }
 
 
     }
