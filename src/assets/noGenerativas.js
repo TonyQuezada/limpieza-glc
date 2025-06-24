@@ -59,7 +59,7 @@ export function eliminarProduccionesNulas(gramaticaOriginal) {
 
       for (const prod of rhsProductions) {
         // Caso 1: Regla directa a la cadena vacía (A -> "").
-        if (prod === "") {
+        if (prod === "" || prod === λ) {
           nullables.add(lhs);
           seAgregoNuevo = true;
           break; // Pasamos al siguiente símbolo (lhs)
