@@ -1,26 +1,4 @@
-/**
- * --- HELPER FUNCTIONS (reutilizadas de respuestas anteriores) ---
- */
-
-/**
- * Determina si una cadena representa un símbolo no terminal (ej: "<S>").
- * @param {string} s - La cadena a verificar.
- * @returns {boolean} - True si es un no terminal.
- */
-function isNonTerminal(s) {
-  return typeof s === 'string' && s.startsWith('<') && s.endsWith('>') && s.length > 2;
-}
-
-/**
- * Parsea una cadena de producción en una lista de tokens.
- * @param {string} str - La cadena de producción a parsear.
- * @returns {string[]} - Un array de tokens.
- */
-function parseProduction(str) {
-  if (typeof str !== 'string' || str.trim() === '') return [];
-  const regex = /<[^>]+>|\[[^\]]+\]|\S/g;
-  return str.match(regex) || [];
-}
+import { isNonTerminal, parseProduction } from "./auxiliares";
 
 
 /**

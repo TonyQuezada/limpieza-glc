@@ -11,6 +11,8 @@ import Lista from './components/Lista'
 import { crearCuadrupla, classifyGrammar } from './assets/clasificar'
 import { eliminarReglasNoGenerativas, eliminarReglasDeRedenominacion } from './assets/noGenerativas'
 import { detectarSimbolosMuertos, limpiarSimbolosMuertos, detectarSimbolosInaccesibles, eliminarReglasInaccesibles } from './assets/limpieza'
+import { eliminarRecursividadIzquierda } from './assets/noRecursividad'
+import { factorizarIzquierda } from './assets/factorizar'
 
 function App() {
   const gramaticaUsuario = useRef("")
@@ -24,7 +26,12 @@ function App() {
   const [sinMuertos, setSinMuertos] = useState({})
   const [accesiblesInaccesibles, setAccesiblesInaccesibles] = useState({})
   const [sinInaccesibles, setSinInaccesibles] = useState({})
-
+  const [sinRecursividad, setSinRecursividad] = useState({})
+  const [noGenerativa2, setNoGenerativa2] = useState({})
+  const [factorizada, setFactorizada] = useState({})
+  const [redenominacion2, setRedenominacion2] = useState({})
+  const [cuadrupla2, setCuadrupla2] = useState({})
+  
   return (
     <div className='flex flex-col w-full justify-content items-center'>
       <h1 className='text-center text-3xl font-bold m-10'>Limpieza de gramáticas libres de contexto</h1>
@@ -36,7 +43,6 @@ function App() {
             const contenido = await leerTXT();
             gramaticaUsuario.current = contenido
             const objeto = formatoJSON(gramaticaUsuario.current)
-            console.log(objeto)
             setMostrarContenido(true)
             setGramaticaObjeto(objeto)
             setCuadrupla(crearCuadrupla(objeto))
@@ -47,17 +53,11 @@ function App() {
             const objetoSinNoGenerativas = eliminarReglasNoGenerativas(objeto)
             setNoGenerativa(objetoSinNoGenerativas)
             
-            console.log(objetoSinNoGenerativas)
-            
             const sinRedenominacion = eliminarReglasDeRedenominacion(objetoSinNoGenerativas)
             setRedenominacion(sinRedenominacion)
 
-            console.log(sinRedenominacion)
-
             const vivosMuertosObjeto = detectarSimbolosMuertos(sinRedenominacion)
             setVivosMuertos(vivosMuertosObjeto)
-
-            console.log(vivosMuertosObjeto.vivos)
 
             const objetoSinMuertos = limpiarSimbolosMuertos(vivosMuertosObjeto.muertos, sinRedenominacion)
             setSinMuertos(objetoSinMuertos)
@@ -68,8 +68,23 @@ function App() {
             const accesibles = eliminarReglasInaccesibles(listaAccesInacces.inaccesible, objetoSinMuertos)
             setSinInaccesibles(accesibles)
 
+            const noRecursividad = eliminarRecursividadIzquierda(accesibles)
+            setSinRecursividad(noRecursividad)
+
+            const sinNoGenerativas2 = eliminarReglasNoGenerativas(noRecursividad)
+            setNoGenerativa2(sinNoGenerativas2)
+
+            const gFactorizada = factorizarIzquierda(sinNoGenerativas2)
+            setFactorizada(gFactorizada)
+
+            const sinRedenominacion2 = eliminarReglasDeRedenominacion(gFactorizada)
+            setRedenominacion2(sinRedenominacion2)
+
+            const cuadruplaFinal = crearCuadrupla(sinRedenominacion2)
+            setCuadrupla2(cuadruplaFinal)
+
           } catch (error) {
-            console.error("No se pudo leer el archivo:", error)
+            // console.error("No se pudo leer el archivo:", error)
           }
         }}
       >Seleccionar gramática</button>
@@ -77,12 +92,12 @@ function App() {
       { mostrarContenido &&
         <div className='flex flex-col gap-5 my-10 max-w-[80vw]'>
 
-          <h2 className='font-semibold text-2xl'>Cuádrupla:</h2>
+          <h2 className='font-semibold text-2xl text-blue-600'>Cuádrupla:</h2>
           <div className='ring-1 p-4'>
             <Cuadrupla terminales={cuadrupla.terminales} noTerminales={cuadrupla.noTerminales} inicial={cuadrupla.inicial}/>
           </div>
 
-          <h2 className='font-semibold text-xl'>Reglas de producción (P) = </h2>
+          <h2 className='font-semibold text-xl '>Reglas de producción (P) = </h2>
           <div className='ring-1 p-4'>
             {
               Object.entries(gramaticaObjeto).map(
@@ -117,7 +132,7 @@ function App() {
                   <div className='font-semibold text-red-600'>Gramática Tipo 3: Regular</div>
               }
               <div className='flex flex-col gap-5 my-10'>
-                <h2 className='font-semibold text-2xl'>Paso 1. Eliminar reglas no generativas</h2>
+                <h2 className='font-semibold text-2xl text-blue-600'>Paso 1. Eliminar reglas no generativas</h2>
                 
                 <div className='ring-1 p-4'>
                 {
@@ -129,7 +144,7 @@ function App() {
                 }
                 </div>
 
-                <h2 className='font-semibold text-2xl'>Paso 2. Eliminar reglas de redenominación</h2>
+                <h2 className='font-semibold text-2xl text-blue-600'>Paso 2. Eliminar reglas de redenominación</h2>
                 
                 <div className='ring-1 p-4'>
                 {
@@ -141,7 +156,7 @@ function App() {
                 }
                 </div>
 
-                <h2 className='font-semibold text-2xl'>Paso 3. Limpieza de la gramática</h2>
+                <h2 className='font-semibold text-2xl text-blue-600'>Paso 3. Limpieza de la gramática</h2>
                 <h2 className='font-semibold text-xl'>3.1 Indentificar símbolos muertos</h2>
                 
                 <div className='ring-1 p-4'>
@@ -176,6 +191,65 @@ function App() {
                   )
                 }
                 </div>
+
+                <h2 className='font-semibold text-2xl text-blue-600'>Paso 4. Eliminar Recursividad por la izquierda</h2>
+                <div className='ring-1 p-4'>
+                {
+                  Object.entries(sinRecursividad).map(
+                    ([key, value]) => (
+                      <Reglas regla={key} producciones={value} key={key}/>
+                    )
+                  )
+                }
+                </div>
+
+                <h2 className='font-semibold text-xl'>4.1 Eliminar reglas no generativas</h2>
+                <div className='ring-1 p-4'>
+                {
+                  Object.entries(noGenerativa2).map(
+                    ([key, value]) => (
+                      <Reglas regla={key} producciones={value} key={key}/>
+                    )
+                  )
+                }
+                </div>
+
+                <h2 className='font-semibold text-2xl text-blue-600'>Paso 5. Factorizar por la izquierda</h2>
+                <div className='ring-1 p-4'>
+                {
+                  Object.entries(factorizada).map(
+                    ([key, value]) => (
+                      <Reglas regla={key} producciones={value} key={key}/>
+                    )
+                  )
+                }
+                </div>
+
+                <h2 className='font-semibold text-xl'>5.1 Eliminar reglas de redenominación</h2>
+                <div className='ring-1 p-4'>
+                {
+                  Object.entries(redenominacion2).map(
+                    ([key, value]) => (
+                      <Reglas regla={key} producciones={value} key={key}/>
+                    )
+                  )
+                }
+                </div>
+
+                <h2 className='font-semibold text-2xl text-blue-600 text-wrap'>Gramática Limpia, sin prefijos comunes y sin recursividad por la izquierda</h2>
+                <div className='ring-1 p-4'>
+                  <Cuadrupla terminales={cuadrupla2.terminales} noTerminales={cuadrupla2.noTerminales} inicial={cuadrupla.inicial}/>
+                  <br />
+                {
+                  Object.entries(redenominacion2).map(
+                    ([key, value]) => (
+                      <Reglas regla={key} producciones={value} key={key}/>
+                    )
+                  )
+                }
+                </div>
+
+
                 
 
               </div>

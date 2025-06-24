@@ -1,18 +1,4 @@
-/**
- * Determina si una cadena representa un símbolo no terminal (ej: "<S>").
- */
-function isNonTerminal(s) {
-  return typeof s === 'string' && s.startsWith('<') && s.endsWith('>') && s.length > 2;
-}
-
-/**
- * Parsea una cadena de producción en una lista de tokens.
- */
-function parseProduction(str) {
-  if (typeof str !== 'string' || str.trim() === '') return [];
-  const regex = /<[^>]+>|\[[^\]]+\]|\S/g;
-  return str.match(regex) || [];
-}
+import { isNonTerminal, parseProduction } from "./auxiliares";
 
 /**
  * Verifica si una producción es un símbolo de épsilon (λ o ε).
